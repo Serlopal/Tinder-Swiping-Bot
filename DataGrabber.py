@@ -35,6 +35,7 @@ def on_release(key):
 def save_profile(swipe):
 
     global dectime
+    global swipec
 
     if dectime == -1:
         dectime = time.time()
@@ -49,18 +50,22 @@ def save_profile(swipe):
     active_picurl = re.findall(r'"(.*?)"', active.find(style = re.compile(".jpg"))["style"])[0] # find picture tag
     info = active.contents[5].text
     active_age = info.split(',')[1][:3].strip()
-    active_bio =  info.split(',')[1][3:].strip() if info.split(',')[1][3:].strip() else "none"
+    # make sure bios do not interfere with underscore separation of fields
+    active_bio = info.split(',')[1][3:].strip().replace(" ", "-").replace("_", "-") if info.split(',')[1][3:].strip() else "none"
     active_name = info.split(',')[0]
 
     filename = "{0}_{1}_{2:.3f}_{3}_{4}_{5}_{6}.jpg".format(time.time(), swipe, time.time() - curr_dectime, active_name, active_age, active_bio, city)
 
     request.urlretrieve(active_picurl, "E:/PythonScripts/TinderExp/data/" + get_valid_filename(filename))
-
+    swipec += 1
+    print("saved swipe " + str(swipec))
 
 
 
 # global variable to store the time elapsed by the user to decide a swipe action
 dectime = -1
+# global variable storing the number of stored swipes
+swipec = 0
 
 if __name__ == "__main__":
 
