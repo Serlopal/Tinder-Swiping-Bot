@@ -1,0 +1,8 @@
+
+.idea/
+data/
+data2/
+hotfix.py
+
+*.dll
+*.exe
