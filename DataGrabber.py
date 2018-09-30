@@ -17,6 +17,7 @@ def get_valid_filename(s):
     s = str(s).strip().replace(' ', '_')
     return re.sub(r'(?u)[^-\w.]', '', s)
 
+
 def on_press(key):
     if key == keyboard.Key.right:
         save_profile("like")
@@ -33,8 +34,16 @@ def on_release(key):
 
 def save_profile(swipe):
 
-    soup = BeautifulSoup(driver.page_source, features="html5lib")
+    global dectime
 
+    if dectime == -1:
+        dectime = time.time()
+        return
+
+    curr_dectime = dectime
+    dectime = time.time()
+
+    soup = BeautifulSoup(driver.page_source, features="html5lib")
 
     active = soup.find("div", {"class": "active"}) # the class that contains the profile pic has an "active" in its name
     active_picurl = re.findall(r'"(.*?)"', active.find(style = re.compile(".jpg"))["style"])[0] # find picture tag
@@ -43,12 +52,15 @@ def save_profile(swipe):
     active_bio =  info.split(',')[1][3:].strip() if info.split(',')[1][3:].strip() else "none"
     active_name = info.split(',')[0]
 
-    filename = "{0}_{1}_{2}_{3}_{4}_{5}.jpg".format(time.time(), swipe, active_name, active_age, active_bio, city)
+    filename = "{0}_{1}_{2:.3f}_{3}_{4}_{5}_{6}.jpg".format(time.time(), swipe, time.time() - curr_dectime, active_name, active_age, active_bio, city)
 
     request.urlretrieve(active_picurl, "E:/PythonScripts/TinderExp/data/" + get_valid_filename(filename))
 
 
 
+
+# global variable to store the time elapsed by the user to decide a swipe action
+dectime = -1
 
 if __name__ == "__main__":
 
@@ -60,6 +72,8 @@ if __name__ == "__main__":
 
     driver = webdriver.Chrome(executable_path="E:\PythonScripts\TinderExp\chromedriver.exe", options=options)
     driver.get('http://tinder.com')
+
+
 
     with keyboard.Listener(on_press=on_press, on_release=on_release) as listener:
         listener.join()
