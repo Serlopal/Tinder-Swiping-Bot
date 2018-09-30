@@ -13,7 +13,9 @@ from urllib import request
 
 
 
-
+def get_valid_filename(s):
+    s = str(s).strip().replace(' ', '_')
+    return re.sub(r'(?u)[^-\w.]', '', s)
 
 def on_press(key):
     if key == keyboard.Key.right:
@@ -43,7 +45,7 @@ def save_profile(swipe):
 
     filename = "{0}_{1}_{2}_{3}_{4}_{5}.jpg".format(time.time(), swipe, active_name, active_age, active_bio, city)
 
-    request.urlretrieve(active_picurl, "E:/PythonScripts/TinderExp/data/" + filename)
+    request.urlretrieve(active_picurl, "E:/PythonScripts/TinderExp/data/" + get_valid_filename(filename))
 
 
 
