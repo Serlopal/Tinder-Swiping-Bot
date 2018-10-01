@@ -1,6 +1,9 @@
 
 .idea/
 data/
+train_data/
+test_data/
+model/
 data2/
 hotfix.py
 
