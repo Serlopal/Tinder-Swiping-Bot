@@ -19,30 +19,30 @@ def get_valid_filename(s):
 
 
 def on_press(key):
-    if key == keyboard.Key.right:
-        save_profile("like")
 
-    elif key == keyboard.Key.left:
-        save_profile("dislike")
-    else:
+    # if key pressed are right or left arrows (pressed by the software to swipe, do nothing)
+    try:
+        # tell website to like or dislike -> like(3, 4, 5)  dislike (0, 1, 2)
+        if key.char in ['0', '1', '2']:
+            save_profile(key.char)
+            k.press(keyboard.Key.left)
+            k.release(keyboard.Key.left)
+        elif key.char in ['3', '4', '5']:
+            save_profile(key.char)
+            k.press(keyboard.Key.right)
+            k.release(keyboard.Key.right)
+        else:
+            pass
+    except:
         pass
-
 
 def on_release(key):
     pass
 
 
-def save_profile(swipe):
+def save_profile(score):
 
-    global dectime
     global swipec
-
-    if dectime == -1:
-        dectime = time.time()
-        return
-
-    curr_dectime = dectime
-    dectime = time.time()
 
     soup = BeautifulSoup(driver.page_source, features="html5lib")
 
@@ -54,16 +54,13 @@ def save_profile(swipe):
     active_bio = info.split(',')[1][3:].strip().replace(" ", "-").replace("_", "-") if info.split(',')[1][3:].strip() else "none"
     active_name = info.split(',')[0]
 
-    filename = "{0}_{1}_{2:.3f}_{3}_{4}_{5}_{6}.jpg".format(time.time(), swipe, time.time() - curr_dectime, active_name, active_age, active_bio, city)
+    filename = "{0}_{1}_{2}_{3}_{4}_{5}.jpg".format(time.time(), score, active_name, active_age, active_bio, city)
 
-    request.urlretrieve(active_picurl, "E:/PythonScripts/TinderExp/data/" + get_valid_filename(filename))
+    request.urlretrieve(active_picurl, "E:/PythonScripts/TinderExp/data2/" + get_valid_filename(filename))
     swipec += 1
     print("saved swipe " + str(swipec))
 
 
-
-# global variable to store the time elapsed by the user to decide a swipe action
-dectime = -1
 # global variable storing the number of stored swipes
 swipec = 0
 
@@ -78,7 +75,7 @@ if __name__ == "__main__":
     driver = webdriver.Chrome(executable_path="E:\PythonScripts\TinderExp\chromedriver.exe", options=options)
     driver.get('http://tinder.com')
 
-
+    k = keyboard.Controller()
 
     with keyboard.Listener(on_press=on_press, on_release=on_release) as listener:
         listener.join()
